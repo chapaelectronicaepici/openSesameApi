@@ -1,5 +1,5 @@
 import socket from "socket.io";
-import express from "express";
+import express, { Router } from "express";
 import path from "path";
 import { createServer } from "http";
 import bodyParser from "body-parser";
@@ -9,11 +9,12 @@ import config from "./config";
 import mongoose from "mongoose";
 
 /* Routes */
-import usuarioRoute from "./routes/usuario.route";
-import alertaRoute from "./routes/alerta.route";
+import userRoute from "./routes/user.route";
+import alertRoute from "./routes/alert.route";
 /* Constant */
 const app = express();
 const server = createServer(app);
+const router = Router();
 
 /* Configuration */
 
@@ -54,9 +55,10 @@ app.use(bodyParser.json({ type: "application/json" }));
 /* routes */
 app.use(express.static(path.join(__dirname, "../public")));
 
-app.use("/usuario", usuarioRoute);
-app.use("/alerta", alertaRoute);
+router.use("/users", userRoute);
+router.use("/alerts", alertRoute);
 
+app.use('/api/', router);
 /* Server */
 server.listen(config.PORT, () => {
   console.log("Servidor ejecutandoce en puerto: ", config.PORT);
@@ -66,7 +68,6 @@ const io = socket(server);
 
 
 io.of("/socket").on("connection", socket => {
-  console.log("Nueva conexion", socket.id);
   socket.on("alert:new", data => {
     io.of("/socket").emit("alert:web", data);
   });

@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import { Router } from "express";
-import Usuario from "../models/Usuario";
+import User from "../models/User";
 
-const UsuarioRouter = Router();
+const UserRouter = Router();
 
-UsuarioRouter.get("/", (req, res) => {
-  let query = Usuario.find({});
+UserRouter.get("/", (req, res) => {
+  let query = User.find({});
   query.exec((err, usuarios) => {
     if (err) {
       return res.send(err);
@@ -17,9 +17,9 @@ UsuarioRouter.get("/", (req, res) => {
   });
 });
 
-UsuarioRouter.post("/", (req, res) => {
-  var newUsuario = new Usuario(req.body);
-  newUsuario.save((err, usuario) => {
+UserRouter.post("/", (req, res) => {
+  var newUser = new User(req.body);
+  newUser.save((err, usuario) => {
     if (err) {
       return res.json({
         message: err,
@@ -28,15 +28,15 @@ UsuarioRouter.post("/", (req, res) => {
     }
     delete usuario.clave;
     res.json({
-      message: "Usuario satisfactoriamente agregado",
+      message: "User satisfactoriamente agregado",
       data: usuario,
       error: false
     });
   });
 });
 
-UsuarioRouter.post("/login", (req, res) => {
-  Usuario.findOne(
+UserRouter.post("/login", (req, res) => {
+  User.findOne(
     {
       correo: req.body.correo,
       clave: req.body.clave
@@ -54,7 +54,7 @@ UsuarioRouter.post("/login", (req, res) => {
 
       if (usuario !== null) {
         res.json({
-          message: "Usuario encontrado",
+          message: "User encontrado",
           data: usuario,
           error: false
         });
@@ -68,8 +68,8 @@ UsuarioRouter.post("/login", (req, res) => {
   );
 });
 
-UsuarioRouter.get("/:id", (req, res) => {
-  Usuario.findById(req.params.id, (err, usuario) => {
+UserRouter.get("/:id", (req, res) => {
+  User.findById(req.params.id, (err, usuario) => {
     if (err) {
       return res.send(err);
     }
@@ -77,20 +77,20 @@ UsuarioRouter.get("/:id", (req, res) => {
   });
 });
 
-UsuarioRouter.delete("/", (req, res) => {
-  Usuario.remove({ _id: req.params.id }, (err, result) => {
+UserRouter.delete("/", (req, res) => {
+  User.remove({ _id: req.params.id }, (err, result) => {
     if (err) {
       return res.send(err);
     }
     res.json({
-      message: "Usuario satisfactoriamente eliminado",
+      message: "User satisfactoriamente eliminado",
       result
     });
   });
 });
 
-UsuarioRouter.put("/", (req, res) => {
-  Usuario.findById({ _id: req.params.id }, (err, usuario) => {
+UserRouter.put("/", (req, res) => {
+  User.findById({ _id: req.params.id }, (err, usuario) => {
     if (err) {
       return res.send(err);
     }
@@ -99,11 +99,11 @@ UsuarioRouter.put("/", (req, res) => {
         return res.send(err);
       }
       res.json({
-        message: "Usuario satisfactoriamente modificado",
+        message: "User satisfactoriamente modificado",
         usuario
       });
     });
   });
 });
 
-export default UsuarioRouter;
+export default UserRouter;
