@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Usuario from "./User";
+import mongoosePaginate from "mongoose-paginate";
 var usuarioSchema = Usuario.schema;
 
 const Schema = mongoose.Schema;
@@ -17,5 +18,7 @@ let AlertSchema = new Schema(
     versionKey: false
   }
 );
+
+AlertSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("alert", AlertSchema);

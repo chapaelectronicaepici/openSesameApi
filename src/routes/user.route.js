@@ -1,35 +1,36 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 import { Router } from "express";
-import User from "../models/User";
 
+import config from "../config";
+import User from "../models/User";
 const UserRouter = Router();
 
 UserRouter.get("/", (req, res) => {
-  let query = User.find({});
-  query.exec((err, usuarios) => {
-    if (err) {
-      return res.send(err);
-    }
-    res.json({
-      error: false,
-      data: usuarios
+  const page = req.query.page || 1;
+  User.paginate({}, { page, limit: 10 })
+    .then(function(result) {
+      res.json(result);
+    })
+    .catch(err => {
+      res.send(err);
     });
-  });
 });
 
 UserRouter.post("/", (req, res) => {
-  var newUser = new User(req.body);
-  newUser.save((err, usuario) => {
+  const body = req.body;
+  body.password = bcrypt.hashSync(body.password, config.SALT_ROUNDS);
+  const newUser = new User(body);
+  newUser.save((err, user) => {
     if (err) {
       return res.json({
         message: err,
         error: true
       });
     }
-    delete usuario.clave;
+    delete user.password;
     res.json({
-      message: "User satisfactoriamente agregado",
-      data: usuario,
+      data: user,
       error: false
     });
   });
@@ -38,13 +39,13 @@ UserRouter.post("/", (req, res) => {
 UserRouter.post("/login", (req, res) => {
   User.findOne(
     {
-      correo: req.body.correo,
-      clave: req.body.clave
+      email: req.body.email,
+      password: bcrypt.hashSync(req.body.password, config.SALT_ROUNDS)
     },
     {
-      clave: false,
+      password: false
     },
-    (err, usuario) => {
+    (err, user) => {
       if (err) {
         return res.json({
           message: err,
@@ -52,15 +53,13 @@ UserRouter.post("/login", (req, res) => {
         });
       }
 
-      if (usuario !== null) {
+      if (user !== null) {
         res.json({
-          message: "User encontrado",
-          data: usuario,
+          data: user,
           error: false
         });
       } else {
         res.json({
-          message: "Credenciales incorrectas.",
           error: true
         });
       }
