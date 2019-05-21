@@ -10,7 +10,6 @@ let UserSchema = new Schema(
     email: { type: String, required: true },
     password: { type: String },
     role: { type: String, required: true },
-    state: { type: Boolean, default: true },
     createAt: { type: Date, default: new Date() }
   },
   {
