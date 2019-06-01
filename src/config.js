@@ -6,5 +6,6 @@ export default {
     useNewUrlParser: true
   },
   SALT_ROUNDS: process.env.SALT_ROUNDS,
-  PORT: process.env.PORT
+  PORT: process.env.PORT,
+  SECRET: process.env.SECRET
 };

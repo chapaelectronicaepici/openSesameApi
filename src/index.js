@@ -10,7 +10,8 @@ import mongoose from "mongoose";
 
 /* Routes */
 import userRoute from "./routes/user.route";
-import alertRoute from "./routes/alert.route";
+import courseRoute from "./routes/course.route";
+import scheduleRoute from "./routes/schedule.route";
 /* Constant */
 const app = express();
 const server = createServer(app);
@@ -18,10 +19,7 @@ const router = Router();
 
 /* Configuration */
 
-mongoose.connect(
-  config.DBHOST,
-  config.DBOPTIONS
-);
+mongoose.connect(config.DBHOST, config.DBOPTIONS);
 
 let database = mongoose.connection;
 database.on("error", console.error.bind(console, "Connection Error"));
@@ -56,9 +54,10 @@ app.use(bodyParser.json({ type: "application/json" }));
 app.use(express.static(path.join(__dirname, "../public")));
 
 router.use("/users", userRoute);
-router.use("/alerts", alertRoute);
+router.use("/courses", courseRoute);
+router.use("/schedules", scheduleRoute);
 
-app.use('/api/', router);
+app.use("/api/", router);
 /* Server */
 server.listen(config.PORT, () => {
   console.log("Servidor ejecutandoce en puerto: ", config.PORT);
@@ -66,16 +65,15 @@ server.listen(config.PORT, () => {
 
 const io = socket(server);
 
-
 io.of("/socket").on("connection", socket => {
-  socket.on("alert:new", data => {
-    io.of("/socket").emit("alert:web", data);
+  socket.on("course:new", data => {
+    io.of("/socket").emit("course:web", data);
   });
-  socket.on("alert:updated", data => {
-    io.of("/socket").emit("alert:recieveUpdated", data);
+  socket.on("course:updated", data => {
+    io.of("/socket").emit("course:recieveUpdated", data);
   });
 
-  socket.on("alert:atencion", data => {
-    io.of("/socket").emit("alert:emitirAtencio", data);
+  socket.on("course:atencion", data => {
+    io.of("/socket").emit("course:emitirAtencio", data);
   });
 });

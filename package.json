@@ -1,5 +1,5 @@
 {
-  "name": "AlertWomanApi",
+  "name": "OpenSesameApi",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/chapaelectronicaepici/openSesameApi",
@@ -22,6 +22,7 @@
     "helmet": "^3.18.0",
     "http": "^0.0.0",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
     "mongoose": "^5.3.13",
     "mongoose-paginate": "^5.0.3",
     "morgan": "^1.9.1",

@@ -4,12 +4,19 @@ import { Router } from "express";
 
 import config from "../config";
 import User from "../models/User";
+import { createToken } from "../services";
+import { checkTokenAdministrator, checkToken } from "../middleware";
 const UserRouter = Router();
 
-UserRouter.get("/", (req, res) => {
+UserRouter.get("/", checkTokenAdministrator, (req, res) => {
   const page = req.query.page || 1;
-  User.paginate({}, { page, limit: 10 })
-    .then(function(result) {
+  const roleParam = req.query.role || false;
+  const query = {};
+  if (roleParam) {
+    query.role = roleParam;
+  }
+  User.paginate(query, { page, limit: 10 })
+    .then(result => {
       res.json(result);
     })
     .catch(err => {
@@ -28,9 +35,9 @@ UserRouter.post("/", (req, res) => {
         error: true
       });
     }
-    delete user.password;
     res.json({
       data: user,
+      token: createToken(user),
       error: false
     });
   });
@@ -56,6 +63,7 @@ UserRouter.post("/login", (req, res) => {
       if (user !== null) {
         res.json({
           data: user,
+          token: createToken(user),
           error: false
         });
       } else {
@@ -67,8 +75,20 @@ UserRouter.post("/login", (req, res) => {
   );
 });
 
-UserRouter.get("/:id", (req, res) => {
-  User.findById(req.params.id, (err, usuario) => {
+UserRouter.get("/:id", checkToken, (req, res) => {
+  const {
+    decoded: {
+      data: { id, role }
+    }
+  } = req;
+  const idUser = req.params.id;
+  if (idUser !== id && role !== "administrator") {
+    return res.send({
+      error: true,
+      message: "Unauthorized user"
+    });
+  }
+  User.findById(idUser, (err, usuario) => {
     if (err) {
       return res.send(err);
     }
@@ -76,7 +96,19 @@ UserRouter.get("/:id", (req, res) => {
   });
 });
 
-UserRouter.delete("/", (req, res) => {
+UserRouter.delete("/:id", (req, res) => {
+  const {
+    decoded: {
+      data: { id, role }
+    }
+  } = req;
+  const idUser = req.params.id;
+  if (idUser !== id && role !== "administrator") {
+    return res.send({
+      error: true,
+      message: "Unauthorized user"
+    });
+  }
   User.remove({ _id: req.params.id }, (err, result) => {
     if (err) {
       return res.send(err);
@@ -88,7 +120,19 @@ UserRouter.delete("/", (req, res) => {
   });
 });
 
-UserRouter.put("/", (req, res) => {
+UserRouter.put("/:id", (req, res) => {
+  const {
+    decoded: {
+      data: { id, role }
+    }
+  } = req;
+  const idUser = req.params.id;
+  if (idUser !== id && role !== "administrator") {
+    return res.send({
+      error: true,
+      message: "Unauthorized user"
+    });
+  }
   User.findById({ _id: req.params.id }, (err, usuario) => {
     if (err) {
       return res.send(err);

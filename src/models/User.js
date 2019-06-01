@@ -8,7 +8,7 @@ let UserSchema = new Schema(
     lastName: { type: String, required: true },
     dni: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String },
+    password: { type: String, select: false },
     role: { type: String, required: true },
     createAt: { type: Date, default: new Date() }
   },

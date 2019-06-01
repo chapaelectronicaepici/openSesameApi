@@ -34,22 +34,27 @@ var _mongoose = require("mongoose");
 
 var _mongoose2 = _interopRequireDefault(_mongoose);
 
-var _usuario = require("./routes/usuario.route");
+var _user = require("./routes/user.route");
 
-var _usuario2 = _interopRequireDefault(_usuario);
+var _user2 = _interopRequireDefault(_user);
 
-var _alerta = require("./routes/alerta.route");
+var _course = require("./routes/course.route");
 
-var _alerta2 = _interopRequireDefault(_alerta);
+var _course2 = _interopRequireDefault(_course);
+
+var _schedule = require("./routes/schedule.route");
+
+var _schedule2 = _interopRequireDefault(_schedule);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* Constant */
-
+var app = (0, _express2.default)();
 
 /* Routes */
-var app = (0, _express2.default)();
+
 var server = (0, _http.createServer)(app);
+var router = (0, _express.Router)();
 
 /* Configuration */
 
@@ -79,9 +84,11 @@ app.use(_bodyParser2.default.json({ type: "application/json" }));
 /* routes */
 app.use(_express2.default.static(_path2.default.join(__dirname, "../public")));
 
-app.use("/usuario", _usuario2.default);
-app.use("/alerta", _alerta2.default);
+router.use("/users", _user2.default);
+router.use("/courses", _course2.default);
+router.use("/schedules", _schedule2.default);
 
+app.use("/api/", router);
 /* Server */
 server.listen(_config2.default.PORT, function () {
   console.log("Servidor ejecutandoce en puerto: ", _config2.default.PORT);
@@ -90,11 +97,14 @@ server.listen(_config2.default.PORT, function () {
 var io = (0, _socket2.default)(server);
 
 io.of("/socket").on("connection", function (socket) {
-  console.log("Nueva conexion", socket.id);
-  socket.on("alert:new", function (data) {
-    io.of("/socket").emit("alert:web", data);
+  socket.on("course:new", function (data) {
+    io.of("/socket").emit("course:web", data);
   });
-  socket.on("alert:updated", function (data) {
-    io.of("/socket").emit("alert:recieveUpdated", data);
+  socket.on("course:updated", function (data) {
+    io.of("/socket").emit("course:recieveUpdated", data);
+  });
+
+  socket.on("course:atencion", function (data) {
+    io.of("/socket").emit("course:emitirAtencio", data);
   });
 });

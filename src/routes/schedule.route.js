@@ -61,7 +61,7 @@ ScheduleRouter.get("/:id", (req, res) => {
   });
 });
 
-ScheduleRouter.delete("/", (req, res) => {
+ScheduleRouter.delete("/:id", (req, res) => {
   Schedule.remove({ _id: req.params.id }, (err, result) => {
     if (err) {
       return res.send(err);

@@ -61,7 +61,7 @@ CourseRouter.get("/:id", (req, res) => {
   });
 });
 
-CourseRouter.delete("/", (req, res) => {
+CourseRouter.delete("/:id", (req, res) => {
   Course.remove({ _id: req.params.id }, (err, result) => {
     if (err) {
       return res.send(err);
