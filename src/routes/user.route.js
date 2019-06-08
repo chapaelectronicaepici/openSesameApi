@@ -15,7 +15,7 @@ UserRouter.get("/", checkTokenAdministrator, (req, res) => {
   if (roleParam) {
     query.role = roleParam;
   }
-  User.paginate(query, { page, limit: 10 })
+  User.find(query)
     .then(result => {
       res.json(result);
     })
@@ -91,6 +91,23 @@ UserRouter.get("/:id", checkToken, (req, res) => {
   User.findById(idUser, (err, usuario) => {
     if (err) {
       return res.send(err);
+    }
+    res.json(usuario);
+  });
+});
+
+UserRouter.get("/data/me", checkToken, (req, res) => {
+  const {
+    decoded: {
+      data: { id }
+    }
+  } = req;
+  User.findById(id, (err, usuario) => {
+    if (err) {
+      return res.send({
+        error: true,
+        message: err
+      });
     }
     res.json(usuario);
   });

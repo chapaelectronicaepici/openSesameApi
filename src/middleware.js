@@ -3,6 +3,12 @@ import config from "./config";
 
 export const checkToken = (req, res, next) => {
   let token = req.headers["x-access-token"] || req.headers["authorization"]; // Express headers are auto converted to lowercase
+  if (!token)
+    return res.json({
+      success: false,
+      message: "Token is not valid"
+    });
+    
   if (token.startsWith("Bearer ")) {
     // Remove Bearer from string
     token = token.slice(7, token.length);

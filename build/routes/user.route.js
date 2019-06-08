@@ -37,7 +37,7 @@ UserRouter.get("/", _middleware.checkTokenAdministrator, function (req, res) {
   if (roleParam) {
     query.role = roleParam;
   }
-  _User2.default.paginate(query, { page: page, limit: 10 }).then(function (result) {
+  _User2.default.find(query).then(function (result) {
     res.json(result);
   }).catch(function (err) {
     res.send(err);
@@ -106,6 +106,20 @@ UserRouter.get("/:id", _middleware.checkToken, function (req, res) {
   _User2.default.findById(idUser, function (err, usuario) {
     if (err) {
       return res.send(err);
+    }
+    res.json(usuario);
+  });
+});
+
+UserRouter.get("/data/me", _middleware.checkToken, function (req, res) {
+  var id = req.decoded.data.id;
+
+  _User2.default.findById(id, function (err, usuario) {
+    if (err) {
+      return res.send({
+        error: true,
+        message: err
+      });
     }
     res.json(usuario);
   });
