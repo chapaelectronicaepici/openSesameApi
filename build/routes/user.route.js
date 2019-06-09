@@ -105,9 +105,15 @@ UserRouter.get("/:id", _middleware.checkToken, function (req, res) {
   }
   _User2.default.findById(idUser, function (err, usuario) {
     if (err) {
-      return res.send(err);
+      return res.json({
+        error: true,
+        message: err
+      });
     }
-    res.json(usuario);
+    res.json({
+      error: false,
+      user: usuario
+    });
   });
 });
 
@@ -125,7 +131,7 @@ UserRouter.get("/data/me", _middleware.checkToken, function (req, res) {
   });
 });
 
-UserRouter.delete("/:id", function (req, res) {
+UserRouter.delete("/:id", _middleware.checkToken, function (req, res) {
   var _req$decoded$data2 = req.decoded.data,
       id = _req$decoded$data2.id,
       role = _req$decoded$data2.role;
@@ -148,7 +154,7 @@ UserRouter.delete("/:id", function (req, res) {
   });
 });
 
-UserRouter.put("/:id", function (req, res) {
+UserRouter.put("/:id", _middleware.checkToken, function (req, res) {
   var _req$decoded$data3 = req.decoded.data,
       id = _req$decoded$data3.id,
       role = _req$decoded$data3.role;
@@ -163,6 +169,12 @@ UserRouter.put("/:id", function (req, res) {
   _User2.default.findById({ _id: req.params.id }, function (err, usuario) {
     if (err) {
       return res.send(err);
+    }
+    var body = req.body;
+    if (body.password.trim() !== "") {
+      body.password = _bcrypt2.default.hashSync(body.password.trim(), _config2.default.SALT_ROUNDS);
+    } else {
+      delete body.password;
     }
     Object.assign(usuario, req.body).save(function (err, usuario) {
       if (err) {

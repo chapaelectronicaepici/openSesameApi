@@ -90,9 +90,15 @@ UserRouter.get("/:id", checkToken, (req, res) => {
   }
   User.findById(idUser, (err, usuario) => {
     if (err) {
-      return res.send(err);
+      return res.json({
+        error: true,
+        message: err
+      });
     }
-    res.json(usuario);
+    res.json({
+      error: false,
+      user: usuario
+    });
   });
 });
 
@@ -113,7 +119,7 @@ UserRouter.get("/data/me", checkToken, (req, res) => {
   });
 });
 
-UserRouter.delete("/:id", (req, res) => {
+UserRouter.delete("/:id", checkToken, (req, res) => {
   const {
     decoded: {
       data: { id, role }
@@ -137,7 +143,7 @@ UserRouter.delete("/:id", (req, res) => {
   });
 });
 
-UserRouter.put("/:id", (req, res) => {
+UserRouter.put("/:id", checkToken, (req, res) => {
   const {
     decoded: {
       data: { id, role }
@@ -153,6 +159,12 @@ UserRouter.put("/:id", (req, res) => {
   User.findById({ _id: req.params.id }, (err, usuario) => {
     if (err) {
       return res.send(err);
+    }
+    const body = req.body;
+    if (body.password.trim() !== "") {
+      body.password = bcrypt.hashSync(body.password.trim(), config.SALT_ROUNDS);
+    } else {
+      delete body.password;
     }
     Object.assign(usuario, req.body).save((err, usuario) => {
       if (err) {

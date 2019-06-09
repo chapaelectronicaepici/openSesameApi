@@ -1,13 +1,10 @@
 import mongoose from "mongoose";
-import mongoosePaginate from "mongoose-paginate";
-
 const Schema = mongoose.Schema;
-
 let ScheduleSchema = new Schema(
   {
-    day: { type: Number },
-    startTime: { type: Date, default: new Date() },
-    endTime: { type: Date, default: new Date() },
+    day: { type: Number, required: true },
+    startTime: { type: Date, default: new Date(), required: true },
+    endTime: { type: Date, default: new Date(), required: true },
     createAt: { type: Date, default: new Date() }
   },
   {
@@ -15,5 +12,4 @@ let ScheduleSchema = new Schema(
   }
 );
 
-ScheduleSchema.plugin(mongoosePaginate);
 export default mongoose.model("schedule", ScheduleSchema);

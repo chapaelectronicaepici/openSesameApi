@@ -1,12 +1,26 @@
 import mongoose from "mongoose";
 import { Router } from "express";
 import Course from "../models/Course";
+import User from "../models/User";
+import { checkToken } from "../middleware";
 
 const CourseRouter = Router();
 
-CourseRouter.get("/", (req, res) => {
-  Course.paginate({}, { page, limit: 10 })
-    .then(function(result) {
+CourseRouter.get("/", checkToken, (req, res) => {
+  const {
+    decoded: {
+      data: { role }
+    }
+  } = req;
+  if (role !== "administrator") {
+    return res.send({
+      error: true,
+      message: "Unauthorized user"
+    });
+  }
+  Course.find({})
+    .populate("user")
+    .then(result => {
       res.json(result);
     })
     .catch(err => {
@@ -14,23 +28,18 @@ CourseRouter.get("/", (req, res) => {
     });
 });
 
-CourseRouter.get("/activas", (req, res) => {
-  let query = Course.find({ estado: true });
-  query.exec((err, courses) => {
-    if (err) {
-      return res.send({
-        message: err,
-        error: true
-      });
+CourseRouter.post("/", checkToken, (req, res) => {
+  const {
+    decoded: {
+      data: { role }
     }
-    res.json({
-      data: courses,
-      error: false
+  } = req;
+  if (role !== "administrator") {
+    return res.send({
+      error: true,
+      message: "Unauthorized user"
     });
-  });
-});
-
-CourseRouter.post("/", (req, res) => {
+  }
   var newCourse = new Course(req.body);
   newCourse.save((err, course) => {
     if (err) {
@@ -46,22 +55,46 @@ CourseRouter.post("/", (req, res) => {
   });
 });
 
-CourseRouter.get("/:id", (req, res) => {
-  Course.findById(req.params.id, (err, course) => {
-    if (err) {
-      return res.send({
-        message: err,
-        error: true
-      });
+CourseRouter.get("/:id", checkToken, (req, res) => {
+  const {
+    decoded: {
+      data: { role }
     }
-    res.json({
-      data: course,
-      error: false
+  } = req;
+  if (role !== "administrator") {
+    return res.send({
+      error: true,
+      message: "Unauthorized user"
     });
-  });
+  }
+  Course.findOne({ _id: req.params.id })
+    .populate("user")
+    .exec((err, course) => {
+      if (err) {
+        return res.send({
+          message: err,
+          error: true
+        });
+      }
+      res.json({
+        course,
+        error: false
+      });
+    });
 });
 
-CourseRouter.delete("/:id", (req, res) => {
+CourseRouter.delete("/:id", checkToken, (req, res) => {
+  const {
+    decoded: {
+      data: { role }
+    }
+  } = req;
+  if (role !== "administrator") {
+    return res.send({
+      error: true,
+      message: "Unauthorized user"
+    });
+  }
   Course.remove({ _id: req.params.id }, (err, result) => {
     if (err) {
       return res.send(err);
@@ -72,7 +105,18 @@ CourseRouter.delete("/:id", (req, res) => {
   });
 });
 
-CourseRouter.put("/:id", (req, res) => {
+CourseRouter.put("/:id", checkToken, (req, res) => {
+  const {
+    decoded: {
+      data: { role }
+    }
+  } = req;
+  if (role !== "administrator") {
+    return res.send({
+      error: true,
+      message: "Unauthorized user"
+    });
+  }
   Course.findOneAndUpdate(
     req.params.id,
     req.body,

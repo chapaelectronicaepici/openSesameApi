@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
-import User from "./User";
-import mongoosePaginate from "mongoose-paginate";
-var userSchema = User.schema;
+import Schedule from "./Schedule";
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const Schema = mongoose.Schema;
-
 let CourseSchema = new Schema(
   {
     name: { type: String },
-    user: { type: userSchema, required: true },
+    user: { type: ObjectId, required: true, ref: "user" },
+    schedules: [{ type: Array, type: Schedule.schema }],
     createAt: { type: Date, default: new Date() }
   },
   {
@@ -16,5 +15,4 @@ let CourseSchema = new Schema(
   }
 );
 
-CourseSchema.plugin(mongoosePaginate);
 export default mongoose.model("course", CourseSchema);
