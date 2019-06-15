@@ -115,7 +115,7 @@ CourseRouter.put("/:id", _middleware.checkToken, function (req, res) {
       message: "Unauthorized user"
     });
   }
-  _Course2.default.findOneAndUpdate(req.params.id, req.body, { new: true }, function (err, course) {
+  _Course2.default.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true }, function (err, course) {
     if (err) {
       return res.send(err);
     }

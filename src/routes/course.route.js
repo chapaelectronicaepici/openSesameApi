@@ -118,7 +118,7 @@ CourseRouter.put("/:id", checkToken, (req, res) => {
     });
   }
   Course.findOneAndUpdate(
-    req.params.id,
+    { _id: req.params.id },
     req.body,
     { new: true },
     (err, course) => {
