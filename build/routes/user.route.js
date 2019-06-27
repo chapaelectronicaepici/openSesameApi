@@ -150,7 +150,6 @@ UserRouter.get("/data/isValidTime", _middleware.checkToken, function (req, res) 
   _Course2.default.find({
     user: id
   }).populate("user").lean().then(function (courses) {
-    // console.log("courses", courses);
     courses.forEach(function (_ref) {
       var schedules = _ref.schedules;
 

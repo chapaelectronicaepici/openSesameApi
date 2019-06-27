@@ -139,7 +139,6 @@ UserRouter.get("/data/isValidTime", checkToken, (req, res) => {
     .populate("user")
     .lean()
     .then(courses => {
-      // console.log("courses", courses);
       courses.forEach(({ schedules }) => {
         schedules.forEach(schedule => {
           const durationStart = moment(schedule.startTime);
