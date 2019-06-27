@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { Router } from "express";
-
+import moment from "moment";
 import config from "../config";
 import User from "../models/User";
+import Course from "../models/Course";
 import { createToken } from "../services";
 import { checkTokenAdministrator, checkToken } from "../middleware";
 const UserRouter = Router();
@@ -117,6 +118,57 @@ UserRouter.get("/data/me", checkToken, (req, res) => {
     }
     res.json(usuario);
   });
+});
+
+UserRouter.get("/data/isValidTime", checkToken, (req, res) => {
+  const baseDate = moment()
+    .day(1)
+    .set({
+      minutes: 0,
+      hours: 0
+    });
+  const currentTime = moment();
+  const {
+    decoded: {
+      data: { id }
+    }
+  } = req;
+  Course.find({
+    user: id
+  })
+    .populate("user")
+    .lean()
+    .then(courses => {
+      // console.log("courses", courses);
+      courses.forEach(({ schedules }) => {
+        schedules.forEach(schedule => {
+          const durationStart = moment(schedule.startTime);
+          const durationEnd = moment(schedule.endTime);
+          const start = baseDate.clone().add({
+            days: schedule.day,
+            minutes: durationStart.minutes(),
+            hours: durationStart.hours(),
+            seconds: durationStart.seconds()
+          });
+          const end = baseDate.clone().add({
+            days: schedule.day,
+            minutes: durationEnd.minutes(),
+            hours: durationEnd.hours(),
+            seconds: durationEnd.seconds()
+          });
+          console.log(
+            "Fecha",
+            start.format("DD-MM-YYYY-HH:mm"),
+            end.format("DD-MM-YYYY-HH:mm"),
+            currentTime.format("DD-MM-YYYY HH:mm")
+          );
+        });
+      });
+      res.json(courses);
+    })
+    .catch(err => {
+      res.send(err);
+    });
 });
 
 UserRouter.delete("/:id", checkToken, (req, res) => {

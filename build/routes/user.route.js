@@ -14,6 +14,10 @@ var _bcrypt2 = _interopRequireDefault(_bcrypt);
 
 var _express = require("express");
 
+var _moment = require("moment");
+
+var _moment2 = _interopRequireDefault(_moment);
+
 var _config = require("../config");
 
 var _config2 = _interopRequireDefault(_config);
@@ -21,6 +25,10 @@ var _config2 = _interopRequireDefault(_config);
 var _User = require("../models/User");
 
 var _User2 = _interopRequireDefault(_User);
+
+var _Course = require("../models/Course");
+
+var _Course2 = _interopRequireDefault(_Course);
 
 var _services = require("../services");
 
@@ -128,6 +136,45 @@ UserRouter.get("/data/me", _middleware.checkToken, function (req, res) {
       });
     }
     res.json(usuario);
+  });
+});
+
+UserRouter.get("/data/isValidTime", _middleware.checkToken, function (req, res) {
+  var baseDate = (0, _moment2.default)().day(1).set({
+    minutes: 0,
+    hours: 0
+  });
+  var currentTime = (0, _moment2.default)();
+  var id = req.decoded.data.id;
+
+  _Course2.default.find({
+    user: id
+  }).populate("user").lean().then(function (courses) {
+    // console.log("courses", courses);
+    courses.forEach(function (_ref) {
+      var schedules = _ref.schedules;
+
+      schedules.forEach(function (schedule) {
+        var durationStart = (0, _moment2.default)(schedule.startTime);
+        var durationEnd = (0, _moment2.default)(schedule.endTime);
+        var start = baseDate.clone().add({
+          days: schedule.day,
+          minutes: durationStart.minutes(),
+          hours: durationStart.hours(),
+          seconds: durationStart.seconds()
+        });
+        var end = baseDate.clone().add({
+          days: schedule.day,
+          minutes: durationEnd.minutes(),
+          hours: durationEnd.hours(),
+          seconds: durationEnd.seconds()
+        });
+        console.log("Fecha", start.format("DD-MM-YYYY-HH:mm"), end.format("DD-MM-YYYY-HH:mm"), currentTime.format("DD-MM-YYYY HH:mm"));
+      });
+    });
+    res.json(courses);
+  }).catch(function (err) {
+    res.send(err);
   });
 });
 
