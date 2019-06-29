@@ -161,7 +161,8 @@ UserRouter.get("/data/isValidTime", checkToken, (req, res) => {
             "Fecha",
             startDate.utc().format("DD-MM-YYYY HH:mm"),
             endDate.utc().format("DD-MM-YYYY HH:mm"),
-            currentTime.utc().format("DD-MM-YYYY HH:mm")
+            currentTime.utc().format("DD-MM-YYYY HH:mm"),
+            currentTime.utc().isBetween(startDate.utc(), endDate.utc())
           );
           if (currentTime.utc().isBetween(startDate.utc(), endDate.utc())) {
             res.json({
