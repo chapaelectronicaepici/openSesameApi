@@ -133,6 +133,7 @@ UserRouter.get("/data/isValidTime", checkToken, (req, res) => {
       data: { id }
     }
   } = req;
+  let band = false;
   Course.find({
     user: id
   })
@@ -167,12 +168,14 @@ UserRouter.get("/data/isValidTime", checkToken, (req, res) => {
             res.json({
               isValidTime: true
             });
+            band = true;
           }
         });
       });
-      res.json({
-        isValidTime: false
-      });
+      if (band === false)
+        res.json({
+          isValidTime: false
+        });
     })
     .catch(err => {
       res.send(err);
