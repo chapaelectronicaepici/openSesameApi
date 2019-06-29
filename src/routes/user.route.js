@@ -165,13 +165,13 @@ UserRouter.get("/data/isValidTime", checkToken, (req, res) => {
               currentTime.format("DD-MM-YYYY HH:mm")
             );
             res.json({
-              isValidTime: false
+              isValidTime: true
             });
           }
         });
       });
       res.json({
-        isValidTime: true
+        isValidTime: false
       });
     })
     .catch(err => {
