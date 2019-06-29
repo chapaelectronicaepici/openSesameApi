@@ -142,6 +142,7 @@ UserRouter.get("/data/isValidTime", checkToken, (req, res) => {
     .then(courses => {
       courses.forEach(({ schedules }) => {
         schedules.forEach(schedule => {
+          console.log("schedule", schedule);
           const durationStart = moment(schedule.startTime);
           const durationEnd = moment(schedule.endTime);
 
@@ -157,14 +158,13 @@ UserRouter.get("/data/isValidTime", checkToken, (req, res) => {
             hours: durationEnd.hours(),
             seconds: durationEnd.seconds()
           });
-          console.log(
-            "Fecha",
-            startDate.utc().format("DD-MM-YYYY HH:mm"),
-            endDate.utc().format("DD-MM-YYYY HH:mm"),
-            currentTime.utc().format("DD-MM-YYYY HH:mm"),
-            currentTime.utc().isBetween(startDate.utc(), endDate.utc())
-          );
-          if (currentTime.utc().isBetween(startDate.utc(), endDate.utc())) {
+          if (currentTime.isBetween(startDate, endDate)) {
+            console.log(
+              "Fecha",
+              startDate.format("DD-MM-YYYY HH:mm"),
+              endDate.format("DD-MM-YYYY HH:mm"),
+              currentTime.format("DD-MM-YYYY HH:mm")
+            );
             res.json({
               isValidTime: true
             });
